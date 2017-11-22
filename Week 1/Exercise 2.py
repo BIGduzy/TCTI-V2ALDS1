@@ -17,7 +17,9 @@ def get_numbers(s):
             numbers.append(int(cur_number))
             cur_number = ''
 
+    if cur_number != '':
+        numbers.append(int(cur_number))
     return numbers
 
-a = 'een123zin45 6met-632meerdere+7777getallen'
+a = '11een123zin45 6met-632meerdere+7777getallen14'
 print(get_numbers(a))
