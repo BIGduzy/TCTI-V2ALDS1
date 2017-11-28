@@ -1,21 +1,18 @@
-class MyStack:
-    def __init__(self):
-        self.stack = []
-
+class MyStack(list):
     def push(self, el):
-        self.stack.append(el)
+        self.append(el)
 
-    def pop(self):
+    def pop(self, index=-1):
         assert not self.is_empty()
-        return self.stack.pop()
+        return super(MyStack, self).pop()
 
     def peek(self):
         assert not self.is_empty()
-        return self.stack[-1]
+        return self[-1]
         # return self.stack[-1] if not self.is_empty() else None
 
     def is_empty(self):
-        return self.stack == []
+        return self == []
 
 
 if __name__ == "__main__":
