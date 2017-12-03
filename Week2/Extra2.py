@@ -1,3 +1,5 @@
+import copy
+
 def maze_solver(maze, x = 0, y = 0, direction = -1):
     """
     Description
@@ -70,8 +72,8 @@ def fill_maze(maze, solution, x = 0, y = 0, symbol = '.'):
     :param symbol: Replace character
     :return: 2 dimensional list with solved maze
     """
-
-    maze[y][x] = symbol
+    tmp = copy.deepcopy(maze)
+    tmp[y][x] = symbol
     for direction in solution:
         if direction == 0:
             y -= 1
@@ -83,9 +85,9 @@ def fill_maze(maze, solution, x = 0, y = 0, symbol = '.'):
             x -= 1
 
         # Mark maze
-        maze[y][x] = symbol
+        tmp[y][x] = symbol
 
-    return maze
+    return tmp
 
 
 def print_2d_list(lst):
