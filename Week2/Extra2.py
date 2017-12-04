@@ -1,9 +1,37 @@
 import copy
+g_full_path = []
 
-def maze_solver(maze, x = 0, y = 0, direction = -1):
+
+def inverted_direction(direction) -> int:
     """
     Description
-    Solves maze
+    Inverts direction
+
+    :param direction: Direction
+    :return: Inverted direction
+    """
+    return direction + 2 if direction < 2 else direction - 2
+
+
+def valid_tile(maze, x, y) -> bool:
+    """
+    Description
+    Checks if tile x,y are in the maze and if the tile at x,y is a non wall
+
+    :param maze: The maze that needs to be checked
+    :param x: X position
+    :param y: Y position
+    :return: If tile is valid
+    """
+    return (0 <= y < len(maze) and
+            0 <= x < len(maze[y]) and
+            maze[y][x] != 1)
+
+
+def maze_solver(maze, x = 0, y = 0, direction = -1) -> list:
+    """
+    Description
+    Solves maze, writes full path in global variable
 
     :param maze: The 2 dimensional list maze that needs to be solved
     :param x: Current x position
@@ -11,56 +39,36 @@ def maze_solver(maze, x = 0, y = 0, direction = -1):
     :param direction: Direction the function came from
     :return: List with solution path
     """
+    global g_full_path
 
-    # check possible directions
-    # North
-    if direction != 2 and y - 1 >= 0 and maze[y - 1][x] != 1:
-        # print('North possible')
-        if maze[y - 1][x] == -1:
-            # print('Won')
-            return [0]  # return direction to finish
-        else:
-            sol = maze_solver(maze, x, y - 1, 0)  # Do the same for next tile
-            # if the next tile has a solution
-            if sol:
-                return [0] + sol  # chain solution to found solution
-    # East
-    if direction != 3 and x + 1 < len(maze[y]) and maze[y][x + 1] != 1:
-        # print('East possible')
-        if maze[y][x + 1] == -1:
-            # print('Won')
-            return [1]  # return direction to finish
-        else:
-            sol = maze_solver(maze, x + 1, y, 1)  # Do the same for next tile
-            # if the next tile has a solution
-            if sol:
-                return [1] + sol  # chain solution to found solution
-    # South
-    if direction != 0 and y + 1 < len(maze) and maze[y + 1][x] != 1:
-        # print("South possible")
-        if maze[y + 1][x] == -1:
-            # print('Won')
-            return [2]  # return direction to finish
-        else:
-            sol = maze_solver(maze, x, y + 1, 2)  # Do the same for next tile
-            if sol:
-                return [2] + sol  # chain solution to found solution
-    # West
-    if direction != 1 and x - 1 >= 0 and maze[y][x - 1] != 1:
-        # print("West possible")
-        if maze[y][x - 1] == -1:
-            # print('Won')
-            return [3]  # return direction to finish
-        else:
-            sol = maze_solver(maze, x - 1, y, 3)  # Do the same for next tile
-            # if the next tile has a solution
-            if sol:
-                return [3] + sol  # chain solution to found solution
+    inverted_dir = inverted_direction(direction)
+
+    # check possible directions (North, East, South, West)
+    directions = ((0, -1), (1, 0), (0, 1), (-1, 0))  # x, y
+    for i in range(len(directions)):
+        direct = directions[i]
+        new_pos = (x + direct[0], y + direct[1])  # x, y
+        if i != inverted_dir and valid_tile(maze, new_pos[0], new_pos[1]):  # maze[y][x]
+            # add step to full path
+            g_full_path.append(i)
+
+            # If next tile == finish
+            if maze[new_pos[1]][new_pos[0]] == -1:
+                return [i]
+            else:
+                # Next tile is empty so we check that tile recursively
+                sol = maze_solver(maze, new_pos[0], new_pos[1], i)
+                # If the recursive function found a route return current direction + found solution
+                if sol:
+                    return [i] + sol
+
+    # add the inverse to full path to backtrack
+    g_full_path.append(inverted_dir)
 
     return []
 
 
-def fill_maze(maze, solution, x = 0, y = 0, symbol = '.'):
+def fill_maze(maze, solution, x = 0, y = 0, symbol = '.') -> list:
     """
     Description
     Fills maze with solution path
@@ -72,6 +80,7 @@ def fill_maze(maze, solution, x = 0, y = 0, symbol = '.'):
     :param symbol: Replace character
     :return: 2 dimensional list with solved maze
     """
+
     tmp = copy.deepcopy(maze)
     tmp[y][x] = symbol
     for direction in solution:
